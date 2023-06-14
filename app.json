@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app_backend",
-    "slug": "app_backend",
+    "name": "app_backend_redux",
+    "slug": "app_backend_redux",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

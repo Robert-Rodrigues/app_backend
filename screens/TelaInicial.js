@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { Button } from 'react-native-paper';
 
+
 const TelaInicial = ({ navigation }) => {
   return (
     <View style={styles.container}>

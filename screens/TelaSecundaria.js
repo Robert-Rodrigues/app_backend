@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, StyleSheet, View, ScrollView, Image, Dimensions } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import useSWR from 'swr';
+import { actionTypes } from './store';
+import { Card, Avatar } from 'react-native-paper';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -12,10 +15,19 @@ const convertBase64ToImage = (base64String) => {
 };
 
 const Feed = () => {
-  const { data: posts, error: postsError } = useSWR(
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
+
+  const { data: fetchedPosts, error: postsError } = useSWR(
     'https://api-mobile.herokuapp.com/users/1/posts',
     fetcher
   );
+
+  useEffect(() => {
+    if (fetchedPosts) {
+      dispatch({ type: actionTypes.SET_POSTS, payload: fetchedPosts });
+    }
+  }, [dispatch, fetchedPosts]);
 
   if (postsError) {
     return <Text>Error loading posts</Text>;
@@ -28,14 +40,27 @@ const Feed = () => {
   return (
     <ScrollView style={styles.container}>
       {posts.map((post) => (
-        <View key={post.id} style={styles.postContainer}>
+        <Card key={post.id} style={styles.card}>
+          <Card.Title
+            title="Pierre Aronnax"
+            left={(props) => (
+              <Avatar.Image
+                {...props}
+                source={require('../assets/avatar.png')}
+              />
+            )}
+          />
           {post.content && (
             <Image
               source={{ uri: convertBase64ToImage(post.content) }}
               style={styles.contentImage}
             />
           )}
-        </View>
+          <Card.Content style={styles.cardContent}>
+            <Text style={styles.title}>{post.title}</Text>
+            <Text style={styles.description}>{post.description}</Text>
+          </Card.Content>
+        </Card>
       ))}
     </ScrollView>
   );
@@ -46,13 +71,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  postContainer: {
-    marginBottom: 10,
+  card: {
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 10,
+    elevation: 2,
   },
   contentImage: {
-    width: windowWidth,
-    height: windowWidth,
-    marginBottom: 10,
+    width: '100%',
+    height: 500,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  cardContent: {
+    padding: 10,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 14,
+    color: '#888',
   },
 });
 
